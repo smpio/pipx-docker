@@ -37,7 +37,8 @@ jobs:
       - name: Extract Docker metadata
         id: meta
         run: |
-          image="${{ inputs.registry }}/${{ inputs.image_name }}"
+          #image="${{ inputs.registry }}/${{ inputs.image_name }}"
+          image="ghcr.io/smpio/pipx-docker"
           echo "::set-output name=tags::$image:9999"
 
       # Build and push Docker image with Buildx (don't push on PR)
