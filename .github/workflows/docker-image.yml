@@ -70,7 +70,7 @@ jobs:
           tags = list(get_semver_tags(tag))
 
           full_tags = (f'{image}:{t}' for t in tags)
-          full_tags_str = '\n'.join(full_tags) + '\n{image}:latest'
+          full_tags_str = '\n'.join(full_tags) + f'\n{image}:latest'
 
           print(f'::set-output name=tags::{escape(full_tags_str)}')
 
