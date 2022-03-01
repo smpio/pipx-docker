@@ -34,12 +34,36 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract Docker metadata
+      - name: Extract tags from Dockerfile
         id: meta
+        shell: python
         run: |
-          #image="${{ inputs.registry }}/${{ inputs.image_name }}"
-          image="ghcr.io/smpio/pipx-docker"
-          echo "::set-output name=tags::$image:9999"
+          #image='${{ inputs.registry }}/${{ inputs.image_name }}'
+          image='ghcr.io/smpio/pipx-docker'
+
+          def get_base_image(fp):
+            for line in fp:
+              line = line.split()
+              if line and line[0] == 'FROM':
+                return line[1]
+
+          def get_semver_tags(base_tag):
+            tags = base_tag.split('.')
+            while tags:
+              yield '.'.join(tags)
+              tags.pop()
+
+          with open('Dockerfile', 'r') as fp:
+            base_image = get_base_image(fp)
+            if not base_image:
+              raise Exception('No base image in Dockerfile!')
+
+          img, tag = base_image.split(':', maxsplit=1)
+          tags = list(get_semver_tags(tag))
+
+          full_tags = (f'{image}:{t}' for t in tags)
+          full_tags_str = ' '.join(full_tags)
+          print(f'::set-output name=tags::{full_tags_str} {image}:latest')
 
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
