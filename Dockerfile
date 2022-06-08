@@ -1,4 +1,4 @@
-FROM python:3.11.0b3
+FROM python:3.10.5
 
 RUN pip install pipx
 
